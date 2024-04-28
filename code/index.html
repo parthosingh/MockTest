@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    #container {
+     /* border: 1px solid black; */
+     padding: 10px 20px 0px 20px;
+     margin: auto;
+    }
+    #container > thead{
+        background-color: #F2F2F2;
+    }
+    thead th{
+        padding-left: 120xp;
+        padding-right: 120px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+   #border{
+    border-bottom: 1px solid black;
+   }
+  #Box{
+    display: flex;
+    justify-content: space-around;
+  }
+
+    </style>
+</head>
+<body>
+<div id="Box">
+    <div>
+        
+            <label>Filter By  Department:</label>
+            <select id="filterDepartment">
+            <option>--Select Department--</option>
+            <option value="hr">hr</option>
+            <option value="finance">finance</option>
+            <option value="marketing">marketing</option>
+            <option value="engineering">engineering</option>
+            <option value="operations">operations</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Filter by Gender :</label>
+        <select id="Gender">
+            <option>Select Gender:</option>
+            <option value="female">female</option>
+            <option value="male">male</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Sort by Salary:</label>
+        <select id="Range">
+            <option>Price Range</option>
+            <option value="asc">Low to High</option>
+            <option value="desc">High to Low</option>
+        </select>
+    </div>
+</div>
+    <table id="container">
+        <thead>
+            <th>S.no</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Department</th>
+            <th>Salary</th>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", function() { 
+let selectPrice = document.getElementById("Range");
+let filterDepartmentGender = document.getElementById("Gender");
+let filterDepartmentSelect = document.getElementById("filterDepartment");
+
+let tableBody = document.querySelector("#container > tbody")
+ let getData = async(URL)=>{
+  let res = await fetch(URL)
+  let final = await res.json()
+
+  data = final.data
+  console.log(data)
+  showData(data)
+ }
+
+ let showData = (arr)=>{
+    arr.forEach((ele , i)=>{
+  
+  let tr = document.createElement("tr");
+  
+   let td1 = document.createElement("td")
+   td1.innerHTML = `${ele.id}`
+
+   let td2 = document.createElement("td");
+   td2.innerHTML = `${ele.name}`
+
+   let td3 = document.createElement("td");
+   td3.innerHTML = `${ele.gender}`
+
+   let td4 = document.createElement("td");
+   td4.innerHTML = `${ele.department}`
+
+   let td5 = document.createElement("td");
+   td5.innerHTML = `${ele.salary}`
+
+   tr.append(td1,td2,td3,td4,td5)
+
+   tableBody.append(tr)
+    })
+ }
+
+
+
+ 
+filterDepartmentSelect.addEventListener("change",  function(){
+    let selectedDepartment = filterDepartmentSelect.value;
+    let rows = tableBody.querySelectorAll("tr");
+
+    rows.forEach(function(row) {
+        let departmentCell = row.querySelector("td:nth-child(4)");
+
+        if(selectedDepartment == "" || selectedDepartment == departmentCell.textContent)
+        {
+            row.style.display = "table-row";
+        }
+        else{
+            row.style.display = "none";
+        }
+    })
+})
+   
+filterDepartmentGender.addEventListener("change",  function(){
+    let selectedDepartmentGender = filterDepartmentGender.value;
+    let rows = tableBody.querySelectorAll("tr");
+
+    rows.forEach(function(row) {
+        let departmentCell = row.querySelector("td:nth-child(3)");
+
+        if(selectedDepartmentGender == "" || selectedDepartmentGender == departmentCell.textContent)
+        {
+            row.style.display = "table-row";
+        }
+        else{
+            row.style.display = "none";
+        }
+    })
+})
+async function sortData(){
+    let value = selectPrice.value
+    let res = []
+    let narr;
+    if(value == "asc") {
+         res =  await fetch("https://dbioz2ek0e.execute-api.ap-south-1.amazonaws.com/mockapi/get-employees")
+       narr =    res.sort(function(a,b){
+            return a.price - b.price
+        })
+    }else if(value == "desc"){
+         res =  await fetch("https://dbioz2ek0e.execute-api.ap-south-1.amazonaws.com/mockapi/get-employees")
+          narr = res.sort(function(a,b){
+            return b.price - a.price
+})
+    }
+    getData(narr)
+}
+
+selectPrice.addEventListener("change", sortData)
+ getData("https://dbioz2ek0e.execute-api.ap-south-1.amazonaws.com/mockapi/get-employees")
+})
+</script>
+</html>
